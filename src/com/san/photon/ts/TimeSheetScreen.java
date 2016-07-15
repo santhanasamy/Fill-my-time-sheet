@@ -105,7 +105,7 @@ public class TimeSheetScreen {
 				isUIInitialized = true;
 
 			} catch (Exception exe) {
-				
+
 				Utils.printError("Error While Initing UI Components", exe.getMessage());
 				isUIInitialized = false;
 			}
@@ -119,9 +119,13 @@ public class TimeSheetScreen {
 
 		Date lDate = null;
 
+		boolean lIsDateChanged = false;
+
 		for (Task lTask : aTask) {
 
-			if (lDate != lTask.getDate()) {
+			lIsDateChanged = (lDate != lTask.getDate());
+
+			if (lIsDateChanged) {
 				lDate = lTask.getDate();
 				// 0. Choose date
 				mCalButton.click();
@@ -140,14 +144,17 @@ public class TimeSheetScreen {
 			chooseProjectTask(lTask);
 			Utils.wait(1000);
 
+			System.out.println("[From,To][" + lTask.getFrom() + "," + lTask.getTo() + "]");
+
 			// 3. Choose From Time
-			performSeek(mFromSlider, mFromHrTime, (int) lTask.getFrom(), 0);
+			performSeekForFrom(mFromSlider, mFromHrTime, (int) lTask.getFrom(), 0, lIsDateChanged);
 			Utils.wait(1000);
 
 			// 4. Choose to Time
-			performSeek(lToSlider, lToHrTime, (int) lTask.getTo(), 0);
+			performSeekForTo(lToSlider, lToHrTime, (int) lTask.getTo(), 0, lIsDateChanged);
 
 			// 5. Enter comment in the comment box;
+			mCommentTextView.clear();
 			mCommentTextView.sendKeys(lTask.getComment());
 
 			// 6. Save/ Save and Next
@@ -292,6 +299,7 @@ public class TimeSheetScreen {
 
 		boolean lStarted = false;
 
+		System.out.println("\nChoosing date...");
 		for (int i = 0; i < allRows.size(); i++) {
 			WebElement row = allRows.get(i);
 
@@ -299,7 +307,7 @@ public class TimeSheetScreen {
 
 			for (int j = 0; j < cells.size(); j++) {
 				WebElement cell = cells.get(j);
-				System.out.println(cell.getText());
+				System.out.print(cell.getText() + " ");
 
 				if (!lStarted) {
 					lStarted = "1".equalsIgnoreCase(cell.getText());
@@ -309,22 +317,45 @@ public class TimeSheetScreen {
 
 					String lBox = String.format(ElementXPathID.SINGLE_DATE_BOX, i, j + 1);
 					mDriver.findElement(By.xpath(lBox)).click();
+					System.out.println("");
 					return;
 				}
 			}
 		}
+		System.out.println("");
 	}
 
-	public void performSeek(WebElement aSlider, WebElement aTxtHolder, int aMoveToHr, int aMoveToMin) {
+	int mFromSeekPos = 0, mToSeekPos = 0;
 
-		int lMovePos = 0, lTime = 0;
+	public void performSeekForFrom(WebElement aSlider, WebElement aTxtHolder, int aMoveToHr, int aMoveToMin,
+			boolean aSeekFromBegining) {
+
+		int lTime = 0;
+		if (aSeekFromBegining) {
+			mFromSeekPos = 0;
+		}
+		Actions builder = new Actions(mDriver);
+
 		while (lTime != aMoveToHr) {
+			mFromSeekPos += SLIDE_MIN_THRESHOLD;
+			Action action = builder.moveToElement(aSlider, mFromSeekPos, 0).click().build();
+			action.perform();
+			lTime = Integer.parseInt(aTxtHolder.getText());
+		}
+	}
 
-			System.out.println("performSeek[TxtView, Text][" + aTxtHolder + "," + aTxtHolder.getText() + "]");
-			lMovePos += SLIDE_MIN_THRESHOLD;
+	public void performSeekForTo(WebElement aSlider, WebElement aTxtHolder, int aMoveToHr, int aMoveToMin,
+			boolean aSeekFromBegining) {
 
-			Actions builder = new Actions(mDriver);
-			Action action = builder.moveToElement(aSlider, lMovePos, 0).click().build();
+		int lTime = 0;
+		if (aSeekFromBegining) {
+			mToSeekPos = 0;
+		}
+		Actions builder = new Actions(mDriver);
+
+		while (lTime != aMoveToHr) {
+			mToSeekPos += SLIDE_MIN_THRESHOLD;
+			Action action = builder.moveToElement(aSlider, mToSeekPos, 0).click().build();
 			action.perform();
 			lTime = Integer.parseInt(aTxtHolder.getText());
 		}

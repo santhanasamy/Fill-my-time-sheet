@@ -1,0 +1,24 @@
+Uname :santhanasamy_a
+Password :santhanaA2!
+Project :Walgreen
+Task Type :Quick
+Date :28/06/2016
+8-9:Daily scrum meeting.
+9-12:MOBILEDEV-8677 Photo crash analysis.
+13-16:MOBILEDEV-8678 Login crash analysis.
+17-19:Onsite syncup call.
+Date :29/06/2016
+8-9:Daily scrum meeting.
+9-12:Daily MOBILEDEV-8679 Store locator crash analysis.
+13-16:Daily  Worked on the MOBILEDEV-8679 Store locator.
+17-19:Onsite syncup call.
+Date :30/06/2016
+8-9:Daily scrum meeting.
+9-12:Daily MOBILEDEV-8680 Photo thankyou screen crash analysis.
+13-16:Daily Worked on the MOBILEDEV-8680 Photo thankyou screen .
+17-19:Onsite syncup call.
+Date :01/07/2016
+11-14:Received MOBILEDEV-8622 Google play | Forsee crash | Apigee crash - Analysis.
+15-18:Received MOBILEDEV-8622 Google play | Forsee crash | Apigee crash - Implementation.
+18-20:Received MOBILEDEV-8622 Google play | Forsee crash | Apigee crash - Code review.
+20-21:Received MOBILEDEV-8622 Google play | Forsee crash | Apigee crash - Analysis.

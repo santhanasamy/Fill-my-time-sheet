@@ -1,0 +1,27 @@
+
+Version : 1.0
+
+-----------------------
+Limitation
+-----------------------
+Currently it will support only the task type "QUICK"
+
+---------------------------------------------------------------------
+Each input should be formatted as "Key:Value" pairs. 
+
+•1) UserName:Username to login into pulse system
+•2) Password:Password to login into pulse system
+•3) Project:Any word present in the project selection list
+•4) Task type:[Quick/Meeting/Any JIRA ID]
+•5) Task Definition 
+    Date:dd/MM/yyyy
+    StartTime-EndTime:Comment
+---------------------------------------------------------------------
+Sample task definition  
+---------------------------------------------------------------------
+Date :29/06/2016 
+ 8-9:Daily scrum meeting. 
+ 9-12:Daily scrum meeting. 
+ 13-16:Daily scrum meeting. 
+ 17-19:Onsite sync up call.
+--------------------------------------------------------------------- 

@@ -1,5 +1,8 @@
 package com.san.photon.ts;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.text.ParseException;
@@ -9,10 +12,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import com.san.photon.ts.model.Project;
 import com.san.photon.ts.model.Task;
+import com.san.photon.ts.model.User;
 
 public class Utils {
+
+	private static final File mExeutionHome = new File(
+			TimeSheetFiller.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
 	public static void wait(int lTime) {
 		try {
@@ -21,9 +38,148 @@ public class Utils {
 		}
 	}
 
+	public static File getExecutionEnvironment() {
+		return mExeutionHome;
+	}
+
+	public static String getExecutionEnvironmentPath() {
+		return mExeutionHome.getParentFile().getAbsolutePath();
+	}
+
+	public static boolean isInputFileAvailable() {
+
+		File lInputFile = new File(getExecutionEnvironmentPath() + Constants.INPUT_PATH);
+		System.out.println("[Searching Input file path in][" + lInputFile.getAbsolutePath() + "]");
+		return lInputFile.exists();
+	}
+
+	public static File getInputFile() {
+
+		return new File(getExecutionEnvironmentPath().concat(File.separator).concat(Constants.INPUT_PATH));
+	}
+
+	public static void setChromeDriverProperty() {
+
+		String lChromDriverPath = Utils.getExecutionEnvironmentPath().concat(File.separator)
+				.concat(Constants.CHROM_DRIVER_PATH);
+		System.out.println("[Searching Chrome drover in][" + lChromDriverPath + "]");
+		System.setProperty(Constants.DRIVER_KEY, lChromDriverPath);
+	}
+
+	public static User getUserCredential(File aFile) {
+
+		POIFSFileSystem fs;
+		try {
+			fs = new POIFSFileSystem(new FileInputStream(aFile));
+			HSSFWorkbook wb = new HSSFWorkbook(fs);
+			HSSFSheet sheet = wb.getSheetAt(0);
+
+			String lUserName = sheet.getRow(1).getCell(1).getStringCellValue();
+			String lPassword = sheet.getRow(2).getCell(1).getStringCellValue();
+
+			User lUser = new User();
+			lUser.setUserName(lUserName);
+			lUser.setPassword(lPassword);
+			return lUser;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static List<Task> buildTask(File aFile) throws IOException {
+
+		int lFirstTaskRowIndex = 8;
+		POIFSFileSystem fs = null;
+		List<Task> lTaskList = new ArrayList<Task>();
+
+		try {
+			fs = new POIFSFileSystem(new FileInputStream(aFile));
+			HSSFWorkbook wb = new HSSFWorkbook(fs);
+			HSSFSheet sheet = wb.getSheetAt(0);
+
+			int lRowCount = sheet.getPhysicalNumberOfRows();
+			if (lRowCount < lFirstTaskRowIndex) {
+				return null;
+			}
+
+			Project lPro = buildProject(aFile, sheet);
+			int lTaskRowIdx = lFirstTaskRowIndex;
+			Date lDate = null;
+			String lFrmTime, lToTime, lTaskDes;
+			while (true) {
+
+				Cell lCell = sheet.getRow(lTaskRowIdx).getCell(0);
+
+				if (lCell != null && lCell.getCellType() != Cell.CELL_TYPE_BLANK
+						&& HSSFDateUtil.isCellDateFormatted(lCell)) {
+					lDate = lCell.getDateCellValue();
+				}
+
+				lFrmTime = getStringFromCell(sheet.getRow(lTaskRowIdx).getCell(1));
+				lToTime = getStringFromCell(sheet.getRow(lTaskRowIdx).getCell(2));
+				lTaskDes = getStringFromCell(sheet.getRow(lTaskRowIdx).getCell(3));
+
+				if (isEmpty(lFrmTime) && isEmpty(lToTime) && isEmpty(lTaskDes)) {
+					return lTaskList;
+				}
+
+				if (null == lDate || 0 == lTaskDes.length() || 0 == lFrmTime.length() || 0 == lToTime.length()) {
+					throw new IOException("Wrong pattern. Not able to create Task...]");
+				}
+
+				Task lTask = new Task();
+				lTask.setProject(lPro);
+				lTask.setDate(lDate);
+				lTask.setFrom(Double.parseDouble(lFrmTime));
+				lTask.setTo(Double.parseDouble(lToTime));
+				lTask.setComment(lTaskDes);
+
+				lTaskList.add(lTask);
+				lTaskRowIdx++;
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return lTaskList;
+	}
+
+	private static Project buildProject(File aFile, HSSFSheet aSheet) throws IOException {
+
+		int proIdex = 4;
+
+		String lProjectName = aSheet.getRow(proIdex++).getCell(1).getStringCellValue();
+		String lTaskType = aSheet.getRow(proIdex).getCell(1).getStringCellValue();
+
+		if (null == lProjectName || null == lTaskType) {
+			throw new IOException("Missing [Pro-Name, Pro-Value][" + lProjectName + "," + lTaskType + "]");
+		}
+		Project lPro = new Project();
+		lPro.setProjectName(lProjectName);
+		lPro.setTaskType(lTaskType);
+		return lPro;
+	}
+
+	private static String getStringFromCell(Cell aCell) {
+
+		if (aCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+			return String.valueOf(aCell.getNumericCellValue());
+		} else if (aCell.getCellType() == Cell.CELL_TYPE_STRING) {
+			return aCell.getStringCellValue();
+		}
+		return aCell.getStringCellValue();
+	}
+
+	@Deprecated
 	public static List<Task> buildTask(Scanner aScanner) throws IOException {
 
 		List<Task> lTask = new ArrayList<Task>();
+
 		try {
 			Project lPro = buildProject(aScanner);
 			while (aScanner.hasNextLine()) {
@@ -37,14 +193,15 @@ public class Utils {
 		return lTask;
 	}
 
-	private static Date lDate = null;
+	private static Date sDate = null;
 
+	@Deprecated
 	private static Task buildTask(Scanner aScanner, Project lPro) throws IOException, ParseException {
 
 		String lTxt = aScanner.nextLine();
 
 		if (getName(lTxt).contains(Constants.Model.DATE)) {
-			lDate = Constants.INPUT_DATE_FORMATTER.parse(getValue(lTxt));
+			sDate = Constants.INPUT_DATE_FORMATTER.parse(getValue(lTxt));
 			lTxt = aScanner.nextLine();
 		}
 
@@ -57,13 +214,13 @@ public class Utils {
 			lComment = lKeyValue[1];
 		}
 
-		if (null == lDate || null == lComment || 0 == lComment.length() || null == lTimeRange
+		if (null == sDate || null == lComment || 0 == lComment.length() || null == lTimeRange
 				|| lTimeRange.length < 2) {
 			throw new IOException("Wrong pattern. Not able to create Task...]");
 		}
 		Task lTask = new Task();
 		lTask.setProject(lPro);
-		lTask.setDate(lDate);
+		lTask.setDate(sDate);
 		lTask.setFrom(Double.parseDouble(lTimeRange[0]));
 		lTask.setTo(Double.parseDouble(lTimeRange[1]));
 		lTask.setComment(lComment);
@@ -71,6 +228,7 @@ public class Utils {
 		return lTask;
 	}
 
+	@Deprecated
 	private static Project buildProject(Scanner aScanner) throws IOException {
 		String lTxt = aScanner.nextLine();
 
@@ -128,5 +286,10 @@ public class Utils {
 		} else {
 			System.out.println("[" + lMsg + "]");
 		}
+	}
+
+	public static boolean isEmpty(String aStr) {
+
+		return (aStr == null || aStr.length() == 0);
 	}
 }

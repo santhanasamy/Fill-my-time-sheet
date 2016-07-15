@@ -1,5 +1,6 @@
 package com.san.photon.ts;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -8,6 +9,23 @@ public class Constants {
 	public static final boolean DEBUG = false;
 
 	public static final String DRIVER_KEY = "webdriver.chrome.driver";
+
+	public static final String USER_DIR = "user";
+
+	public static final String INPUT_FILE_TXT = "TimeSheetInput.txt";
+
+	public static final String INPUT_FILE_XLS = "TimeSheetInput.xls";
+
+	// "\\user\\TimeSheetInput.txt"
+	public static final String INPUT_PATH = USER_DIR.concat(File.separator).concat(INPUT_FILE_XLS);
+
+	public static final String CHROM_DIR = "chromedriver_win32";
+
+	public static final String CHROM_EXE = "chromedriver.exe";
+
+	// "\\user\\chromedriver_win32\\chromedriver.exe";
+	public static final String CHROM_DRIVER_PATH = USER_DIR.concat(File.separator).concat(CHROM_DIR)
+			.concat(File.separator).concat(CHROM_EXE);
 
 	public static final String CHROME_DRIVER_EXE_PATH = "C:/Users/santhanasamy_a/Desktop/Selinium/chromedriver_win32/chromedriver.exe";
 
@@ -53,7 +71,6 @@ public class Constants {
 
 		String SINGLE_DATE_BOX = "//*[@id='ui-datepicker-div']/table/tbody/tr[%d]/td[%d]";
 
-		
 		String NOTIFICATION_POP_CLOSE_BTN = "//*[@id='myModal']/div[1]/button";
 	}
 

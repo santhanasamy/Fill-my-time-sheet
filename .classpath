@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="libs/selenium-java-2.53.0.jar"/>
 	<classpathentry kind="lib" path="libs/selenium-server-standalone-2.53.0.jar"/>
+	<classpathentry kind="lib" path="libs/poi-3.14-20160307.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
