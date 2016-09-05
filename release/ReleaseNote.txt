@@ -1,6 +1,5 @@
-
-Version : 1.0
-
+-----------------------
+	Version : 1.0
 -----------------------
 Limitation
 -----------------------
@@ -25,3 +24,15 @@ Date :29/06/2016
  13-16:Daily scrum meeting. 
  17-19:Onsite sync up call.
 --------------------------------------------------------------------- 
+	Version : 2.0
+--------------------------------------------------------------------- 
+
+--------------------------------------------------------------------- 
+	Version : 3.0
+--------------------------------------------------------------------- 
+Issues fixes.
+•1) String format issues are resolved. Now both string and date format text are allowed in task date.
+•2) Comment text isssue resolved. If the task description field have any special character like "TAB"
+    selinium will consider those as special and move the focus to the next field. Because of that 
+    out script execution faced upnormal behaviour.
+--------------------------------------------------------------------- 	

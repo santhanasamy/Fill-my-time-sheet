@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.MalformedInputException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,15 +11,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import com.san.photon.ts.model.Project;
 import com.san.photon.ts.model.Task;
@@ -114,9 +109,29 @@ public class Utils {
 
 				Cell lCell = sheet.getRow(lTaskRowIdx).getCell(0);
 
-				if (lCell != null && lCell.getCellType() != Cell.CELL_TYPE_BLANK
-						&& HSSFDateUtil.isCellDateFormatted(lCell)) {
-					lDate = lCell.getDateCellValue();
+				int lType = lCell.getCellType();
+				if (lCell != null && Cell.CELL_TYPE_BLANK != lType) {
+					if (lType == Cell.CELL_TYPE_STRING) {
+
+						String lValue = lCell.getStringCellValue();
+						if (Constants.DEBUG) {
+							System.out.println("[Data Value- In String format][" + lCell.getDateCellValue() + "]");
+						}
+
+						try {
+							lDate = Constants.INPUT_DATE_FORMATTER.parse(lValue);
+						} catch (ParseException e) {
+							e.printStackTrace();
+							throw new IOException("[Wrong pattern. While reading date][" + lValue + "]");
+						}
+					} else if (HSSFDateUtil.isCellDateFormatted(lCell)) {
+
+						if (Constants.DEBUG) {
+							System.out.println("[Data Value- In Date format][" + lCell.getDateCellValue() + "]");
+						}
+
+						lDate = lCell.getDateCellValue();
+					}
 				}
 
 				lFrmTime = getStringFromCell(sheet.getRow(lTaskRowIdx).getCell(1));

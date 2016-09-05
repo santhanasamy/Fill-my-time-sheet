@@ -3,7 +3,6 @@ package com.san.photon.ts;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -155,7 +154,8 @@ public class TimeSheetScreen {
 
 			// 5. Enter comment in the comment box;
 			mCommentTextView.clear();
-			mCommentTextView.sendKeys(lTask.getComment());
+			String lComment = lTask.getComment().replaceAll("	", " ");
+			mCommentTextView.sendKeys(lComment);
 
 			// 6. Save/ Save and Next
 			if (!Constants.DEBUG) {
@@ -299,7 +299,7 @@ public class TimeSheetScreen {
 
 		boolean lStarted = false;
 
-		System.out.println("\nChoosing date...");
+		System.out.print("\nChoosing date... ");
 		for (int i = 0; i < allRows.size(); i++) {
 			WebElement row = allRows.get(i);
 
@@ -322,7 +322,7 @@ public class TimeSheetScreen {
 				}
 			}
 		}
-		System.out.println("");
+		System.out.print(": Success\n");
 	}
 
 	int mFromSeekPos = 0, mToSeekPos = 0;

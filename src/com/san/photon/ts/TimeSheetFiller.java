@@ -17,6 +17,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.san.photon.ts.Constants.ElementID;
 import com.san.photon.ts.model.Task;
 
+/**
+ * Read data from txt files.
+ * @author santhanasamy_a
+ *
+ */
 public class TimeSheetFiller {
 
 	private WebDriver mDriver = null;
