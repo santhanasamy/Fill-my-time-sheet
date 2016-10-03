@@ -36,3 +36,8 @@ Issues fixes.
     selinium will consider those as special and move the focus to the next field. Because of that 
     out script execution faced upnormal behaviour.
 --------------------------------------------------------------------- 	
+	Version : 4.0
+--------------------------------------------------------------------- 
+Issues fixes.
+•1) Issue selecting date belongs to the end of the month.
+    (Fill the timesheet for the last week of the previous month in the current month)

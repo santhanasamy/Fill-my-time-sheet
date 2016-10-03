@@ -51,6 +51,8 @@ public class TimeSheetScreen {
 
 	private WebElement mProTaskSelectSpinner = null;
 
+	private int mFromSeekPos = 0, mToSeekPos = 0;
+
 	public TimeSheetScreen(WebDriver aDriver) {
 		mDriver = aDriver;
 		initUIComponent();
@@ -297,6 +299,13 @@ public class TimeSheetScreen {
 		List<WebElement> allRows = lCalTable.findElements(By.tagName("tr"));
 		// And iterate over them, getting the cells
 
+		while(!selectDate(allRows, lTaskDateStr)) {
+			lPreMonthBtn.click();
+		}
+		System.out.print(": Success\n");
+	}
+
+	private boolean selectDate(List<WebElement> allRows, String aTaskDateStr) {
 		boolean lStarted = false;
 
 		System.out.print("\nChoosing date... ");
@@ -313,19 +322,20 @@ public class TimeSheetScreen {
 					lStarted = "1".equalsIgnoreCase(cell.getText());
 				}
 
-				if (lStarted && lTaskDateStr.equalsIgnoreCase(cell.getText())) {
+				if (lStarted && aTaskDateStr.equalsIgnoreCase(cell.getText())) {
 
+					if (!cell.isEnabled()) {
+						return false;
+					}
 					String lBox = String.format(ElementXPathID.SINGLE_DATE_BOX, i, j + 1);
 					mDriver.findElement(By.xpath(lBox)).click();
 					System.out.println("");
-					return;
+					return true;
 				}
 			}
 		}
-		System.out.print(": Success\n");
+		return false;
 	}
-
-	int mFromSeekPos = 0, mToSeekPos = 0;
 
 	public void performSeekForFrom(WebElement aSlider, WebElement aTxtHolder, int aMoveToHr, int aMoveToMin,
 			boolean aSeekFromBegining) {
